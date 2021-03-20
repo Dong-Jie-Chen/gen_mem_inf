@@ -29,12 +29,14 @@ parser.add_argument('--lr', type=float, default=0.0002, help='learning rate, def
 parser.add_argument('--beta1', type=float, default=0.5, help='beta1 for adam. default=0.5')
 parser.add_argument('--cuda', action='store_true', help='enables cuda')
 parser.add_argument('--ngpu', type=int, default=1, help='number of GPUs to use')
-parser.add_argument('--netBBG', type=str, required=True, help="path to netBBG (to attack)")
+parser.add_argument('--netBBG', type=str, help="path to netBBG (to attack)")
 parser.add_argument('--netWBG', default='', help="path to netWBG (to continue training)")
-parser.add_argument('--netBBD', type=str, required=True, help="path to netBBD (to attack)")
+parser.add_argument('--netBBD', type=str, help="path to netBBD (to attack)")
 parser.add_argument('--netWBD', default='', help="path to netWBD (to continue training)")
 parser.add_argument('--outf', default='.', help='folder to output images and model checkpoints')
 parser.add_argument('--manualSeed', type=int, help='manual seed')
+
+parser.add_argument('--fake_data_dir', type=str, required=True, help="path to fake data ")
 
 opt = parser.parse_args()
 try:
@@ -83,13 +85,14 @@ def weights_init(m):
     elif classname.find('BatchNorm') != -1:
         m.weight.data.normal_(1.0, 0.02)
         m.bias.data.fill_(0)
-
+'''
+remove BBG part, replace with npy files
 netBBG = Generator(ngpu, nz, ngf, nc).to(device)
 netBBG.load_state_dict(torch.load(opt.netBBG))
 
 netBBD = Discriminator(ngpu, nc, ndf).to(device)
 netBBD.load_state_dict(torch.load(opt.netBBD))
-
+'''
 netWBG = Generator(ngpu, nz, ngf, nc).to(device)
 netWBG.apply(weights_init)
 if opt.netWBG != '':
@@ -99,7 +102,7 @@ netWBD = Discriminator(ngpu, nc, ndf).to(device)
 netWBD.apply(weights_init)
 if opt.netWBD != '':
     netWBD.load_state_dict(torch.load(opt.netWBD))
-
+'''
 netBBG.eval()
 netBBD.eval()
 
@@ -125,7 +128,7 @@ for i, data in enumerate(testloader, 0):
 
 wb_predictions = [x[1] for x in sorted(wb_predictions, reverse=True)[:len(testset)]]
 wb_accuracy = wb_predictions.count('test')/float(len(testset))
-
+'''
 ##### Black-box attack ####
 # Trains another GAN on the output of the black-box
 # Then launches whitebox attack with trained Discriminator 
@@ -140,15 +143,19 @@ fake_label = 0
 # setup optimizer
 optimizerD = optim.Adam(netWBD.parameters(), lr=opt.lr, betas=(opt.beta1, 0.999))
 optimizerG = optim.Adam(netWBG.parameters(), lr=opt.lr, betas=(opt.beta1, 0.999))
-
+fake_imgs = np.load(os.path.join(opt.fake_data_dir, 'fake_imgs.npy'))
 for step in range(opt.niter):
     ############################
     # (1) update d network: maximize log(d(x)) + log(1 - d(g(z)))
     ###########################
 
     # generate "real"
+    '''
     real_noise = torch.randn(opt.batchSize, nz, 1, 1, device=device)
     real_cpu = netBBG(real_noise)
+    '''
+    np.random.shuffle(fake_imgs)
+    real_cpu = fake_imgs[:opt.batchSize]
 
     # train with "real"
     netWBD.zero_grad()
