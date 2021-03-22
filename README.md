@@ -5,7 +5,7 @@ This is a toy example (on CIFAR-10) of how to run attacks presented in https://a
 ## To run
 
 1. Train a GAN on CIFAR-10 by `python dcgan.py --outf ./models --dataroot ./data --cuda --niter 50`
-2. Run attack by `python attack.py --outf ./models --dataroot ./data --niter 10000 --cuda --netBBG ./models/netG_epoch_49.pth --netBBD ./models/netD_epoch_49.pth`
+2. Run attack by `python attack.py --outf ./models --dataroot ./data --niter 10000 --cuda --fake_data_dir DIR_TO_IMGS`
 
 ## Results:
 
