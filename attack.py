@@ -160,8 +160,10 @@ for step in range(opt.niter):
     netWBD.zero_grad()
     batch_size = real_cpu.size(0)
     label = torch.full((batch_size,), real_label, device=device)
+    label = label.to(torch.float32)
 
     output = netWBD(real_cpu)
+    output = output.to(torch.float32)
     errD_real = criterion(output, label)
     errD_real.backward()
     D_x = output.mean().item()
@@ -191,13 +193,13 @@ for step in range(opt.niter):
     print('[%d/%d] Loss_D: %.4f Loss_G: %.4f D(x): %.4f D(G(z)): %.4f / %.4f'
           % (step, opt.niter,
              errD.item(), errG.item(), D_x, D_G_z1, D_G_z2))
-    if i % 100 == 0:
+    if step % 100 == 0:
         vutils.save_image(real_cpu,
                 '%s/real_samples.png' % opt.outf,
                 normalize=True)
-        fake = netG(fixed_noise)
+        fake = netWBG(fixed_noise)
         vutils.save_image(fake.detach(),
-                '%s/fake_samples_epoch_%03d.png' % (opt.outf, epoch),
+                '%s/fake_samples_step_%03d.png' % (opt.outf, step),
                 normalize=True)
 
 # do checkpointing
@@ -230,7 +232,7 @@ bb_predictions = [x[1] for x in sorted(bb_predictions, reverse=True)[:len(testse
 bb_accuracy = bb_predictions.count('test')/float(len(testset))
 print()
 print("baseline (random guess) accuracy: {:.3f}".format(len(testset)/float(len(trainset)+len(testset))))
-print("white-box attack accuracy: {:.3f}".format(wb_accuracy))
 print("black-box attack accuracy: {:.3f}".format(bb_accuracy))
+#print("white-box attack accuracy: {:.3f}".format(wb_accuracy))
 
 
