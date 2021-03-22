@@ -19,11 +19,11 @@ from models import weights_init, Generator, Discriminator
 parser = argparse.ArgumentParser()
 parser.add_argument('--dataroot', required=True, help='path to dataset')
 parser.add_argument('--workers', type=int, help='number of data loading workers', default=2)
-parser.add_argument('--batchSize', type=int, default=64, help='input batch size')
-parser.add_argument('--imageSize', type=int, default=64, help='the height / width of the input image to network')
+parser.add_argument('--batchSize', type=int, default=32, help='input batch size')
+parser.add_argument('--imageSize', type=int, default=32, help='the height / width of the input image to network')
 parser.add_argument('--nz', type=int, default=100, help='size of the latent z vector')
-parser.add_argument('--ngf', type=int, default=64)
-parser.add_argument('--ndf', type=int, default=64)
+parser.add_argument('--ngf', type=int, default=32)
+parser.add_argument('--ndf', type=int, default=32)
 parser.add_argument('--niter', type=int, default=100, help='number of steps to train for')
 parser.add_argument('--lr', type=float, default=0.0002, help='learning rate, default=0.0002')
 parser.add_argument('--beta1', type=float, default=0.5, help='beta1 for adam. default=0.5')
@@ -148,11 +148,6 @@ for step in range(opt.niter):
     ############################
     # (1) update d network: maximize log(d(x)) + log(1 - d(g(z)))
     ###########################
-    #test codes
-    noise = torch.randn(batch_size, nz, 1, 1, device=device)
-    fake = netWBG(noise)
-    print(fake)
-    print(fake.shape)
     # generate "real"
     '''
     real_noise = torch.randn(opt.batchSize, nz, 1, 1, device=device)
