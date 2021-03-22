@@ -148,7 +148,11 @@ for step in range(opt.niter):
     ############################
     # (1) update d network: maximize log(d(x)) + log(1 - d(g(z)))
     ###########################
-
+    #test codes
+    noise = torch.randn(batch_size, nz, 1, 1, device=device)
+    fake = netWBG(noise)
+    print(fake)
+    print(fake.shape)
     # generate "real"
     '''
     real_noise = torch.randn(opt.batchSize, nz, 1, 1, device=device)
