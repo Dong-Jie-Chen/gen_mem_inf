@@ -155,7 +155,7 @@ for step in range(opt.niter):
     real_cpu = netBBG(real_noise)
     '''
     np.random.shuffle(fake_imgs)
-    real_cpu = torch.tensor(fake_imgs[:opt.batchSize])
+    real_cpu = torch.tensor(fake_imgs[:opt.batchSize], device=device)
 
     # train with "real"
     netWBD.zero_grad()
